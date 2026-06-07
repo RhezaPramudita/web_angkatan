@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from 'react'
 
 import Image from 'next/image'
+import { Cinzel } from 'next/font/google'
 
 import Instagram from '@/components/atoms/button/InstagramButtonLink'
 import LinkedInButtonLink from '@/components/atoms/button/LinkedInButtonLink'
 import SpotifyEmbed from '@/components/molecules/SpotifyEmbed'
 
-import { Cinzel } from 'next/font/google'
 import BgGif from './gif.gif'
 import ProfileImage from './foto.jpeg'
 
@@ -18,48 +18,66 @@ const cinzel = Cinzel({
 
 const popupStyle = `
   @keyframes slideUpFade {
-    from {
-      opacity: 0;
-      transform: translateY(40px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes goldGlow {
-    0%, 100% {
-      box-shadow: 0 0 8px 2px rgba(212, 175, 55, 0.4);
-    }
-    50% {
-      box-shadow: 0 0 20px 6px rgba(212, 175, 55, 0.8);
-    }
+    0%, 100% { box-shadow: 0 0 8px 2px rgba(212, 175, 55, 0.4); }
+    50% { box-shadow: 0 0 20px 6px rgba(212, 175, 55, 0.8); }
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+
+  @keyframes grain {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-2px, 2px); }
+    50% { transform: translate(2px, -2px); }
+    75% { transform: translate(-1px, 1px); }
   }
 
   .popup-animated {
     animation: slideUpFade 0.4s ease-out, goldGlow 2.5s ease-in-out 0.4s infinite;
   }
 
-  @keyframes twinkle {
-  0%, 100% { opacity: 0; transform: scale(0.5); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
+  .grain-overlay {
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
+    animation: grain 0.8s steps(1) infinite;
+    opacity: 0.08;
+    pointer-events: none;
+    border-radius: 16px;
+  }
 
-.scanlines-overlay {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.15) 2px,
-    rgba(0, 0, 0, 0.15) 4px
-  );
-  pointer-events: none;
-  border-radius: 16px;
-}
+  .vignette-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+    pointer-events: none;
+    border-radius: 16px;
+  }
+
+  .scanlines-overlay {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.15) 2px,
+      rgba(0, 0, 0, 0.15) 4px
+    );
+    pointer-events: none;
+    border-radius: 16px;
+  }
 `
+
 const particles = Array.from({ length: 30 }).map((_, i) => ({
   id: i,
   left: `${Math.random() * 100}%`,
@@ -79,36 +97,35 @@ const MemberPopup = ({ isOpen, onClose }: MemberPopupProps) => {
   const [isWrong, setIsWrong] = useState(false)
   const [inputJawaban, setInputJawaban] = useState('')
   const audioRef = React.useRef<HTMLAudioElement>(null)
-const [isBgmOn, setIsBgmOn] = useState(false)
+  const [isBgmOn, setIsBgmOn] = useState(false)
+  const [displayName, setDisplayName] = useState('')
+  const fullName = 'Rheza Pramudita Adi Putra'
 
-const [displayName, setDisplayName] = useState('')
-const fullName = 'Rheza Pramudita Adi Putra'
+  useEffect(() => {
+    if (!isAnswered) return
+    setDisplayName('')
+    let i = 0
+    const interval = setInterval(() => {
+      if (i < fullName.length) {
+        setDisplayName(fullName.slice(0, i + 1))
+        i++
+      } else {
+        clearInterval(interval)
+      }
+    }, 60)
+    return () => clearInterval(interval)
+  }, [isAnswered])
 
-useEffect(() => {
-  if (!isAnswered) return
-  setDisplayName('')
-  let i = 0
-  const interval = setInterval(() => {
-    if (i < fullName.length) {
-      setDisplayName(fullName.slice(0, i + 1))
-      i++
-    } else {
-      clearInterval(interval)
+  const toggleBgm = () => {
+    if (audioRef.current) {
+      if (isBgmOn) {
+        audioRef.current.pause()
+      } else {
+        audioRef.current.play()
+      }
+      setIsBgmOn(!isBgmOn)
     }
-  }, 60)
-  return () => clearInterval(interval)
-}, [isAnswered])
-
-const toggleBgm = () => {
-  if (audioRef.current) {
-    if (isBgmOn) {
-      audioRef.current.pause()
-    } else {
-      audioRef.current.play()
-    }
-    setIsBgmOn(!isBgmOn)
   }
-}
 
   useEffect(() => {
     if (!isOpen) {
@@ -138,9 +155,9 @@ const toggleBgm = () => {
     // PADA BAGIAN INI KAMU BOLEH MENGUBAH STYLE SESUKA HATI KAMU, TAPI JANGAN UBAH STRUKTUR DAN FUNGSI DARI KODE INI AGAR FUNGSI POPUP TETAP BERJALAN DENGAN BAIK
     <>
       <style>{popupStyle}</style>
-      <audio ref={audioRef} loop onError={() => console.log('audio error')}>
-  <source src="https://res.cloudinary.com/dyy28dpzr/video/upload/v1780829222/fools_w7bp4d.mp3" type="audio/mpeg" />
-</audio>
+      <audio ref={audioRef} loop>
+        <source src="https://res.cloudinary.com/dyy28dpzr/video/upload/v1780829222/fools_w7bp4d.mp3" type="audio/mpeg" />
+      </audio>
       <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto px-4 pt-28 pb-8 sm:pt-32">
         <button
           type="button"
@@ -163,33 +180,35 @@ const toggleBgm = () => {
             x
           </button>
 
+          <button
+            onClick={toggleBgm}
+            className="absolute top-4 right-16 flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-bold transition-colors"
+            style={{ borderColor: '#D4AF37', color: '#D4AF37' }}
+          >
+            🎵 BGM {isBgmOn ? 'ON' : 'OFF'}
+          </button>
+
+          <div className="grain-overlay" />
+          <div className="vignette-overlay" />
           <div className="scanlines-overlay" />
 
           <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
-  {particles.map((p) => (
-    <span
-      key={p.id}
-      style={{
-        position: 'absolute',
-        left: p.left,
-        top: p.top,
-        width: p.size,
-        height: p.size,
-        borderRadius: '50%',
-        backgroundColor: '#D4AF37',
-        animation: `twinkle ${p.duration} ease-in-out ${p.delay} infinite`,
-      }}
-    />
-  ))}
-</div>
-
-          <button
-  onClick={toggleBgm}
-  className="absolute top-4 right-16 flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-bold transition-colors"
-  style={{ borderColor: '#D4AF37', color: '#D4AF37' }}
->
-  🎵 BGM {isBgmOn ? 'ON' : 'OFF'}
-</button>
+            {particles.map((p) => (
+              <span
+                key={p.id}
+                style={{
+                  position: 'absolute',
+                  left: p.left,
+                  top: p.top,
+                  width: p.size,
+                  height: p.size,
+                  borderRadius: '50%',
+                  backgroundColor: '#D4AF37',
+                  animation: `twinkle ${p.duration} ease-in-out ${p.delay} infinite`,
+                }}
+              />
+            ))}
+          </div>
 
           {!isAnswered ? (
             <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
