@@ -40,7 +40,34 @@ const popupStyle = `
   .popup-animated {
     animation: slideUpFade 0.4s ease-out, goldGlow 2.5s ease-in-out 0.4s infinite;
   }
+
+  @keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.scanlines-overlay {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  border-radius: 16px;
+}
 `
+const particles = Array.from({ length: 30 }).map((_, i) => ({
+  id: i,
+  left: `${Math.random() * 100}%`,
+  top: `${Math.random() * 100}%`,
+  size: `${Math.random() * 3 + 1}px`,
+  duration: `${Math.random() * 4 + 2}s`,
+  delay: `${Math.random() * 5}s`,
+}))
 
 type MemberPopupProps = {
   isOpen: boolean
@@ -53,6 +80,24 @@ const MemberPopup = ({ isOpen, onClose }: MemberPopupProps) => {
   const [inputJawaban, setInputJawaban] = useState('')
   const audioRef = React.useRef<HTMLAudioElement>(null)
 const [isBgmOn, setIsBgmOn] = useState(false)
+
+const [displayName, setDisplayName] = useState('')
+const fullName = 'Rheza Pramudita Adi Putra'
+
+useEffect(() => {
+  if (!isAnswered) return
+  setDisplayName('')
+  let i = 0
+  const interval = setInterval(() => {
+    if (i < fullName.length) {
+      setDisplayName(fullName.slice(0, i + 1))
+      i++
+    } else {
+      clearInterval(interval)
+    }
+  }, 60)
+  return () => clearInterval(interval)
+}, [isAnswered])
 
 const toggleBgm = () => {
   if (audioRef.current) {
@@ -118,6 +163,26 @@ const toggleBgm = () => {
             x
           </button>
 
+          <div className="scanlines-overlay" />
+
+          <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+  {particles.map((p) => (
+    <span
+      key={p.id}
+      style={{
+        position: 'absolute',
+        left: p.left,
+        top: p.top,
+        width: p.size,
+        height: p.size,
+        borderRadius: '50%',
+        backgroundColor: '#D4AF37',
+        animation: `twinkle ${p.duration} ease-in-out ${p.delay} infinite`,
+      }}
+    />
+  ))}
+</div>
+
           <button
   onClick={toggleBgm}
   className="absolute top-4 right-16 flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-bold transition-colors"
@@ -170,7 +235,7 @@ const toggleBgm = () => {
 
               <div className="pr-10">
                 {/* UBAH NAMA ANDA */}
-                <h2 className="text-2xl font-black">Rheza Pramudita Adi Putra</h2>
+                <h2 className="text-2xl font-black">{displayName}</h2>
                 {/* UBAH NRP DAN ASAL */}
                 <p className="text-neutral-cs-10/70 mt-1 text-sm font-semibold">5027251090 - Surabaya</p>
               </div>
