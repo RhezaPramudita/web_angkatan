@@ -1,5 +1,7 @@
 'use client'
 
+/* eslint-disable react-hooks/purity */
+
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 /* ─────────────────────────────────────────────
@@ -60,7 +62,7 @@ function playTurnRev(ctx: AudioContext) {
 
 function playOvertureBeep(ctx: AudioContext, onDone: () => void) {
   const notes = [523, 587, 659, 784, 880, 784, 659, 587, 523]
-  let lastEnd = ctx.currentTime + 0.6
+  const lastEnd = ctx.currentTime + 0.6
   notes.forEach((freq, i) => {
     const osc  = ctx.createOscillator()
     const gain = ctx.createGain()
