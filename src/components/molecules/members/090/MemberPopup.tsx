@@ -156,7 +156,7 @@ const MemberPopup = ({ isOpen, onClose }: MemberPopupProps) => {
     <>
       <style>{popupStyle}</style>
       <audio ref={audioRef} loop>
-        <source src="https://res.cloudinary.com/dyy28dpzr/video/upload/v1780829222/fools_w7bp4d.mp3" type="audio/mpeg" />
+          <source src="https://res.cloudinary.com/dyy28dpzr/video/upload/v1780878207/Cry_-_Cigarettes_After_Sex_vqs93z.mp3" type="audio/mpeg" />
       </audio>
       <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto px-4 pt-28 pb-8 sm:pt-32">
         <button
@@ -213,7 +213,7 @@ const MemberPopup = ({ isOpen, onClose }: MemberPopupProps) => {
           {!isAnswered ? (
             <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
               <p className="text-lg font-bold">Jawab dulu yh</p>
-              <p className="text-neutral-cs-10/70 text-sm">Buah, buah apa yang sakit? (A)</p>
+              <p className="text-neutral-cs-10/70 text-sm">Buah, buah apa yang sakit? (A_P_C_T)</p>
               {isWrong && <p className="text-red-400 text-sm">Salahhhh AWOKOAKWOWKOWK</p>}
               <input
                 type="text"
